@@ -2,6 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("admin_privileges", policy =>
+        policy.RequireRole("admin").RequireClaim("scope", "privileges_api"));
 builder.Services.AddDbContext<MedicalDb>(opt => opt.UseInMemoryDatabase("MedicalList"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddEndpointsApiExplorer();
@@ -14,13 +19,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 RouteGroupBuilder Medicalitems = app.MapGroup("/Medicalitems");
 
-Medicalitems.MapGet("/", GetAllMedicals);
-Medicalitems.MapGet("/{id}", GetMedical);
-Medicalitems.MapPost("/", CreateMedical);
-Medicalitems.MapPut("/{id}", UpdateMedical);
-Medicalitems.MapDelete("/{id}", DeleteMedical);
+Medicalitems.MapGet("/", GetAllMedicals).RequireAuthorization("admin_privileges");
+Medicalitems.MapGet("/{id}", GetMedical).RequireAuthorization("admin_privileges");
+Medicalitems.MapPost("/", CreateMedical).RequireAuthorization("admin_privileges");
+Medicalitems.MapPut("/{id}", UpdateMedical).RequireAuthorization("admin_privileges");
+Medicalitems.MapDelete("/{id}", DeleteMedical).RequireAuthorization("admin_privileges");
 
 app.Run();
 
