@@ -30,3 +30,9 @@ C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCor
 C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.InMemory.dll
 C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Projects\Medicalinfo\MedicalApi\obj\Debug\net7.0\MedicalApi.csproj.CopyComplete
+C:\Projects\Medicalinfo\MedicalApi\obj\Debug\net7.0\MedicalApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Microsoft.OpenApi.dll
+C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Projects\Medicalinfo\MedicalApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll

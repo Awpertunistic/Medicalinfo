@@ -1,9 +1,18 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MedicalDb>(opt => opt.UseInMemoryDatabase("MedicalList"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 RouteGroupBuilder Medicalitems = app.MapGroup("/Medicalitems");
 
@@ -22,10 +31,32 @@ static async Task<IResult> GetAllMedicals(MedicalDb db)
 
 static async Task<IResult> GetMedical(int id, MedicalDb db)
 {
-    return await db.Medicals.FindAsync(id)
-        is Medical medical
-            ? TypedResults.Ok(medical)
-            : TypedResults.NotFound();
+    var medical = await db.Medicals.FindAsync(id);
+
+    if (medical is Medical)
+    {
+        var medicalItemDTO = new MedicalItemDTO
+        {
+            Id = medical.Id,
+            FirstName = medical.FirstName,
+            LastName = medical.LastName,
+            Gender = medical.Gender,
+            Birthdate = medical.Birthdate,
+            PhoneNumber = medical.PhoneNumber,
+            Email = medical.Email,
+            StreetAddress = medical.StreetAddress,
+            City = medical.City,
+            State = medical.State,
+            ZipCode = medical.ZipCode,
+            Country = medical.Country
+        };
+
+        return TypedResults.Ok(medicalItemDTO);
+    }
+    else
+    {
+        return TypedResults.NotFound();
+    }
 }
 
 static async Task<IResult> CreateMedical(MedicalItemDTO medicalItemDTO, MedicalDb db)
