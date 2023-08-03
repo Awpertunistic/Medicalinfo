@@ -5,10 +5,9 @@ builder.Services.AddDbContext<MedicalDb>(opt => opt.UseInMemoryDatabase("Medical
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 
-var Medicalitems = app.MapGroup("/Medicalitems");
+RouteGroupBuilder Medicalitems = app.MapGroup("/Medicalitems");
 
 Medicalitems.MapGet("/", GetAllMedicals);
-Medicalitems.MapGet("/complete", GetCompleteMedicals);
 Medicalitems.MapGet("/{id}", GetMedical);
 Medicalitems.MapPost("/", CreateMedical);
 Medicalitems.MapPut("/{id}", UpdateMedical);
@@ -21,11 +20,6 @@ static async Task<IResult> GetAllMedicals(MedicalDb db)
     return TypedResults.Ok(await db.Medicals.ToArrayAsync());
 }
 
-static async Task<IResult> GetCompleteMedicals(MedicalDb db)
-{
-    return TypedResults.Ok(await db.Medicals.Where(t => t.IsComplete).ToListAsync());
-}
-
 static async Task<IResult> GetMedical(int id, MedicalDb db)
 {
     return await db.Medicals.FindAsync(id)
@@ -34,22 +28,50 @@ static async Task<IResult> GetMedical(int id, MedicalDb db)
             : TypedResults.NotFound();
 }
 
-static async Task<IResult> CreateMedical(Medical medical, MedicalDb db)
+static async Task<IResult> CreateMedical(MedicalItemDTO medicalItemDTO, MedicalDb db)
 {
-    db.Medicals.Add(medical);
+    var medicalItem = new Medical
+    {
+        Id = medicalItemDTO.Id,
+        FirstName = medicalItemDTO.FirstName,
+        LastName = medicalItemDTO.LastName,
+        Gender = medicalItemDTO.Gender,
+        Birthdate = medicalItemDTO.Birthdate,
+        PhoneNumber = medicalItemDTO.PhoneNumber,
+        Email = medicalItemDTO.Email,
+        StreetAddress = medicalItemDTO.StreetAddress,
+        City = medicalItemDTO.City,
+        State = medicalItemDTO.State,
+        ZipCode = medicalItemDTO.ZipCode,
+        Country = medicalItemDTO.Country
+    };
+
+    db.Medicals.Add(medicalItem);
     await db.SaveChangesAsync();
 
-    return TypedResults.Created($"/Medicalitems/{medical.Id}", medical);
+    medicalItemDTO = new MedicalItemDTO(medicalItem);
+
+    return TypedResults.Created($"/Medicalitems/{medicalItem.Id}", medicalItemDTO);
 }
 
-static async Task<IResult> UpdateMedical(int id, Medical inputMedical, MedicalDb db)
+static async Task<IResult> UpdateMedical(int id, MedicalItemDTO medicalItemDTO, MedicalDb db)
 {
     var medical = await db.Medicals.FindAsync(id);
 
     if (medical is null) return TypedResults.NotFound();
 
-    medical.Name = inputMedical.Name;
-    medical.IsComplete = inputMedical.IsComplete;
+    medical.Id = medicalItemDTO.Id;
+    medical.FirstName = medicalItemDTO.FirstName;
+    medical.LastName = medicalItemDTO.LastName;
+    medical.Gender = medicalItemDTO.Gender;
+    medical.Birthdate = medicalItemDTO.Birthdate;
+    medical.PhoneNumber = medicalItemDTO.PhoneNumber;
+    medical.Email = medicalItemDTO.Email;
+    medical.StreetAddress = medicalItemDTO.StreetAddress;
+    medical.City = medicalItemDTO.City;
+    medical.State = medicalItemDTO.State;
+    medical.ZipCode = medicalItemDTO.ZipCode;
+    medical.Country = medicalItemDTO.Country;
 
     await db.SaveChangesAsync();
 
@@ -62,6 +84,9 @@ static async Task<IResult> DeleteMedical(int id, MedicalDb db)
     {
         db.Medicals.Remove(medical);
         await db.SaveChangesAsync();
+
+        MedicalItemDTO medicalDTO = new MedicalItemDTO(medical);
+
         return TypedResults.Ok(medical);
     }
 
